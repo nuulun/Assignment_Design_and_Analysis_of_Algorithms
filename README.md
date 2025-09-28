@@ -1,6 +1,6 @@
 # Algo Project
-
 ## Recurrence Analysis
+
 
 ### MergeSort
 - Recurrence: **T(n) = 2T(n/2) + Θ(n)**.
