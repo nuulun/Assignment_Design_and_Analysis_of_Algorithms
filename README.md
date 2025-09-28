@@ -1,5 +1,4 @@
 # Algo Project
-# 📊 Divide-and-Conquer Algorithms: Report
 
 ## Recurrence Analysis
 
