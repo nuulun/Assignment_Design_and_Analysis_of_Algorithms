@@ -39,8 +39,26 @@ public class ClosestPairTest {
 
     @Test
     public void largeTest() {
+        int n = 1000;
+        int trials = 100;
+        for (int t = 0; t < trials/3+1; t++) {
+            test(n);
+        }
+        n = 10000;
+        for (int t = 0; t < trials/3+1; t++) {
+            test(n);
+        }
+        n = 100000;
+        for (int t = 0; t < trials/3+1; t++) {
+            test(n);
+        }
+    }
+
+
+
+    void test(int n){
         Random rnd = new Random(123);
-        int n = 100_000;
+
         Point[] pts = new Point[n];
         for (int i = 0; i < n; i++) {
             pts[i] = new Point(rnd.nextDouble() * 1e6, rnd.nextDouble() * 1e6);
@@ -48,9 +66,16 @@ public class ClosestPairTest {
 
         MetricsObserver metrics = new MetricsObserver();
         ClosestPair cp = new ClosestPair(metrics);
+        long start = System.nanoTime();
 
         double fast = cp.findClosest(pts);
+        long end = System.nanoTime();
+
         System.out.println("Closest distance = " + fast);
-        System.out.println("Comparisons: " + metrics.comparisons + ", MaxDepth: " + metrics.maxDepth);
+        System.out.println("Array size      : " + n);
+        System.out.println("Time (ms)       : " + (end - start) / 1_000_000.0);
+        System.out.println("Comparisons     : " + metrics.comparisons);
+        System.out.println("Allocations     : " + metrics.allocations);
+        System.out.println("Max recursion depth: " + metrics.maxDepth);
     }
 }

@@ -12,28 +12,20 @@ public class SelectMoMTest {
 
     @Test
     void testCorrectnessRandom() {
-        for (int trial = 0; trial < 100; trial++) {
-            int n = 200 + R.nextInt(800);
-            int[] a = R.ints(n, 0, 100000).toArray();
-            int[] copy = Arrays.copyOf(a, a.length);
-            Arrays.sort(copy);
-
-            int k = R.nextInt(n);
-
-            MetricsObserver metrics = new MetricsObserver();
-            long start = System.nanoTime();
-
-            int sel = SelectMoM.select(a, k, metrics);
-            long end = System.nanoTime();
-
-            assertEquals(copy[k], sel, "Mismatch at trial " + trial + " for k=" + k);
-            System.out.println("MergeSort Metrics:");
-            System.out.println("Array size      : " + n);
-            System.out.println("Time (ms)       : " + (end - start) / 1_000_000.0);
-            System.out.println("Comparisons     : " + metrics.comparisons);
-            System.out.println("Allocations     : " + metrics.allocations);
-            System.out.println("Max recursion depth: " + metrics.maxDepth);
+        int n = 1000;
+        int trials = 100;
+        for (int t = 0; t < trials/3+1; t++) {
+            test(n);
         }
+        n = 10000;
+        for (int t = 0; t < trials/3+1; t++) {
+            test(n);
+        }
+        n = 100000;
+        for (int t = 0; t < trials/3+1; t++) {
+            test(n);
+        }
+
     }
 
     @Test
@@ -43,6 +35,27 @@ public class SelectMoMTest {
         assertEquals(1, SelectMoM.select(arr.clone(), 0, obs)); // min
         assertEquals(5, SelectMoM.select(arr.clone(), 2, obs)); // median
         assertEquals(9, SelectMoM.select(arr.clone(), 4, obs)); // max
+    }
+
+    void test(int n) {
+        int[] a = R.ints(n, 0, 100000).toArray();
+        int[] copy = Arrays.copyOf(a, a.length);
+        Arrays.sort(copy);
+
+        int k = R.nextInt(n);
+
+        MetricsObserver metrics = new MetricsObserver();
+        long start = System.nanoTime();
+
+        int sel = SelectMoM.select(a, k, metrics);
+        long end = System.nanoTime();
+
+        assertEquals(copy[k], sel);
+        System.out.println("Array size      : " + n);
+        System.out.println("Time (ms)       : " + (end - start) / 1_000_000.0);
+        System.out.println("Comparisons     : " + metrics.comparisons);
+        System.out.println("Allocations     : " + metrics.allocations);
+        System.out.println("Max recursion depth: " + metrics.maxDepth);
     }
 }
 
