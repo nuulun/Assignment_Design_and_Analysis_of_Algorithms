@@ -1,10 +1,12 @@
 package algo;
 
-
 import java.util.Arrays;
 
 public class SelectMoM {
     public static int select(int[] a, int k, MetricsObserver obs) {
+        if (k < 0 || k >= a.length) {
+            return -1;
+        }
         return select(a, 0, a.length - 1, k, obs, 1);
     }
 
@@ -12,21 +14,21 @@ public class SelectMoM {
                               MetricsObserver obs, int depth) {
         obs.onRecursionDepth(depth);
 
-        while (true) {
-            if (left == right) return a[left];
+        
+        if (left == right) {
+            return a[left];
+        }
 
-            int pivotIndex = medianOfMedians(a, left, right, obs);
-            int pivotNewIndex = partition(a, left, right, pivotIndex, obs);
+    
+        int pivotIndex = medianOfMedians(a, left, right, obs);
+        int pivotNewIndex = partition(a, left, right, pivotIndex, obs);
 
-            if (k == pivotNewIndex) {
-                return a[k];
-            } else if (k < pivotNewIndex) {
-                right = pivotNewIndex - 1;
-                obs.onRecursionDepth(depth + 1);
-            } else {
-                left = pivotNewIndex + 1;
-                obs.onRecursionDepth(depth + 1);
-            }
+        if (k == pivotNewIndex) {
+            return a[k];
+        } else if (k < pivotNewIndex) {
+            return select(a, left, pivotNewIndex - 1, k, obs, depth + 1);
+        } else {
+            return select(a, pivotNewIndex + 1, right, k, obs, depth + 1);
         }
     }
 
@@ -46,6 +48,7 @@ public class SelectMoM {
             numMedians++;
         }
 
+    
         return medianOfMedians(a, left, left + numMedians - 1, obs);
     }
 
