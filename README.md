@@ -26,6 +26,21 @@
 ---
 
 ## 3. Measurements
+ 
+
+### MergeSort
+![MergeSort Runtime](benchmarks/plots/MergeSort_time.png)
+
+### QuickSort
+![QuickSort Runtime](benchmarks/plots/QuickSort_time.png)
+
+### SelectMoM
+![SelectMoM Runtime](benchmarks/plots/SelectMoM_time.png)
+
+### ClosestPair
+![ClosestPair Runtime](benchmarks/plots/ClosestPair_time.png)
+
+
 
 ### Time vs n (ms)
 
