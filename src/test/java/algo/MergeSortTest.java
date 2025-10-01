@@ -20,7 +20,7 @@ public class MergeSortTest {
         for (int t = 0; t < trials/6+1; t++) {
             test(n);
         }
-        n = 20000:
+        n = 20000;
         for (int t = 0; t < trials/6+1; t++) {
             test(n);
         }
