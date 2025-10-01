@@ -12,37 +12,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout
       - uses: actions/checkout@v3
 
+      # 2. Set up Java
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
 
+      # 3. Build with Maven
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
+      # 4. Run tests
       - name: Run tests
         run: mvn test
 
+      # 5. Run Java Benchmark and save CSV
       - name: Run Java Benchmark
         run: |
           mkdir -p benchmarks
           java -cp target/classes algo.Benchmark
           mv results.csv benchmarks/results.csv
 
+      # 6. Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
+      # 7. Install Python dependencies
       - name: Install Python dependencies
         run: pip install matplotlib pandas
 
-      - name: Generate Plots
+      # 8. Generate plots
+      - name: Generate plots
         run: python3 scripts/generate_plots.py benchmarks/results.csv benchmarks/plots/
 
+      # 9. Upload benchmark results & plots
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
         with:
