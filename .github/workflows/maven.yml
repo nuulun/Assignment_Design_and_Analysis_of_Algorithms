@@ -1,6 +1,7 @@
-name: Maven CI with Benchmarks
+name: Java CI with Maven + Benchmarks + Plots
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
   pull_request:
@@ -11,39 +12,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false  # чтобы не конфликтовало с push
-          fetch-depth: 0
+      - uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Run benchmarks
-        run: mvn test -Dbenchmark.output=benchmarks/results.csv
+      - name: Run tests
+        run: mvn test
+
+      - name: Run Java Benchmark
+        run: |
+          mkdir -p benchmarks
+          java -cp target/classes algo.Benchmark
+          mv results.csv benchmarks/results.csv
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
       - name: Install Python dependencies
         run: pip install matplotlib pandas
 
-      - name: Generate plots
-        run: python scripts/generate_plots.py benchmarks/results.csv benchmarks/plots/
+      - name: Generate Plots
+        run: python3 scripts/generate_plots.py benchmarks/results.csv benchmarks/plots/
 
-      - name: Commit and push plots
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add benchmarks/plots/*.png
-          git commit -m "Update benchmark plots [skip ci]" || echo "No changes to commit"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: benchmarks/
