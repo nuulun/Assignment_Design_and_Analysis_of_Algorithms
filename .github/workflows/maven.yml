@@ -1,7 +1,6 @@
-name: Java CI with Maven + Benchmarks
+name: Maven CI with Benchmarks
 
 on:
-  workflow_dispatch:
   push:
     branches: [ "main" ]
   pull_request:
@@ -12,34 +11,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # чтобы не конфликтовало с push
+          fetch-depth: 0
 
-      - name: Set up JDK 24
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '24'
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Run tests
-        run: mvn test
+      - name: Run benchmarks
+        run: mvn test -Dbenchmark.output=benchmarks/results.csv
 
-      
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
       - name: Install Python dependencies
         run: pip install matplotlib pandas
 
-      - name: Run Benchmark
-        run: python3 scripts/benchmark.py
+      - name: Generate plots
+        run: python scripts/generate_plots.py benchmarks/results.csv benchmarks/plots/
 
-      - name: Upload benchmark results
-        uses: actions/upload-artifact@v4
-        with:
-          name: benchmark-results
-          path: results/
+      - name: Commit and push plots
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add benchmarks/plots/*.png
+          git commit -m "Update benchmark plots [skip ci]" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
