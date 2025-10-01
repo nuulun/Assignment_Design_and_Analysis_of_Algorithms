@@ -8,7 +8,7 @@ def main(csv_file, out_dir):
 
     df = pd.read_csv(csv_file)
 
-    # Для каждого алгоритма построим график TimeMs vs N
+
     for algo in df["Algorithm"].unique():
         subset = df[df["Algorithm"] == algo]
         grouped = subset.groupby("N").mean(numeric_only=True)
@@ -25,7 +25,7 @@ def main(csv_file, out_dir):
         plt.close()
         print(f"✅ Saved {out_path}")
 
-    print("📊 All plots generated!")
+    
 
 
 if __name__ == "__main__":
