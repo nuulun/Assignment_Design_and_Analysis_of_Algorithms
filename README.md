@@ -61,7 +61,7 @@
 - **QuickSort**: in-place, no allocations, smaller constant factor than MergeSort.
 - **Select**: grouping by 5 increases constants but still scales linearly.
 - **Closest Pair**: strip check (≈7–8 neighbor comparisons per point) inflates constants.
-- Runtime overhead from **Java GC** and array allocation causes small noise in measurements.
+
 
 ---
 
