@@ -10,7 +10,7 @@ public class Benchmark {
     private static final Random R = new Random();
 
     public static void main(String[] args) throws IOException {
-        try (FileWriter fw = new FileWriter("results.csv")) {
+        try (FileWriter fw = new FileWriter("benchmarks/results.csv")) {
             fw.write("trial,algorithm,n,timeMs,comparisons,allocations,depth\n");
 
             for (int n : SIZES) {
