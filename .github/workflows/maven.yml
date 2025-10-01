@@ -30,7 +30,6 @@ jobs:
         run: |
           mkdir -p benchmarks
           java -cp target/classes algo.Benchmark
-          mv results.csv benchmarks/results.csv
 
       - name: Set up Python
         uses: actions/setup-python@v5
