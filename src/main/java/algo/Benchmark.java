@@ -1,74 +1,93 @@
 package algo;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Random;
 
 public class Benchmark {
-    private static final Random R = new Random();
+    private static final int TRIALS = 100;
+    private static final int[] SIZES = {100, 500, 1000, 5000, 10000};
 
-    public static void main(String[] args) throws IOException {
-        FileWriter fw = new FileWriter("results.csv");
-        fw.write("algorithm,n,trial,comparisons,allocations,depth\n");
+    private static Random random = new Random();
 
-        int[] sizes = {100, 500, 1000, 5000, 10000};
-
-        // MergeSort и QuickSort
-        for (int n : sizes) {
-            for (int t = 0; t < 100; t++) {
-                int[] arr1 = R.ints(n, 0, 100000).toArray();
-                int[] arr2 = arr1.clone();
-
-                // MergeSort
-                MetricsObserver obs1 = new MetricsObserver();
-                MergeSort.sort(arr1, obs1);
-                fw.write("MergeSort," + n + "," + t + "," +
-                        obs1.getComparisons() + "," +
-                        obs1.getAllocations() + "," +
-                        obs1.getMaxDepth() + "\n");
-
-                // QuickSort
-                MetricsObserver obs2 = new MetricsObserver();
-                QuickSort.sort(arr2, obs2);
-                fw.write("QuickSort," + n + "," + t + "," +
-                        obs2.getComparisons() + "," +
-                        obs2.getAllocations() + "," +
-                        obs2.getMaxDepth() + "\n");
-            }
+    public static void main(String[] args) {
+        for (int n : SIZES) {
+            runBenchmarks(n);
         }
+    }
 
-        // Select Median-of-Medians
-        for (int n : sizes) {
-            for (int t = 0; t < 100; t++) {
-                int[] arr = R.ints(n, 0, 100000).toArray();
-                MetricsObserver obs = new MetricsObserver();
-                int k = n / 2;
-                SelectMoM.select(arr, k, obs);
-                fw.write("SelectMoM," + n + "," + t + "," +
-                        obs.getComparisons() + "," +
-                        obs.getAllocations() + "," +
-                        obs.getMaxDepth() + "\n");
-            }
+    private static void runBenchmarks(int n) {
+        System.out.println("=== Benchmark for n = " + n + " ===");
+
+        // ----- MergeSort -----
+        long totalComparisons = 0, totalAllocations = 0;
+        int totalDepth = 0;
+        for (int t = 0; t < TRIALS; t++) {
+            int[] arr = random.ints(n, 0, 100000).toArray();
+            MetricsObserver metrics = new MetricsObserver();
+            MergeSort sorter = new MergeSort(metrics);
+            sorter.sort(arr);
+            totalComparisons += metrics.comparisons;
+            totalAllocations += metrics.allocations;
+            totalDepth += metrics.maxDepth;
         }
+        System.out.println("MergeSort: comps=" + totalComparisons / TRIALS +
+                " allocs=" + totalAllocations / TRIALS +
+                " depth=" + totalDepth / TRIALS);
 
-        // Closest Pair of Points
-        for (int n : sizes) {
-            for (int t = 0; t < 100; t++) {
-                double[][] points = new double[n][2];
-                for (int i = 0; i < n; i++) {
-                    points[i][0] = R.nextDouble() * 1000;
-                    points[i][1] = R.nextDouble() * 1000;
-                }
-                MetricsObserver obs = new MetricsObserver();
-                ClosestPair.closestPair(points, obs);
-                fw.write("ClosestPair," + n + "," + t + "," +
-                        obs.getComparisons() + "," +
-                        obs.getAllocations() + "," +
-                        obs.getMaxDepth() + "\n");
-            }
+        // ----- QuickSort -----
+        totalComparisons = 0;
+        totalAllocations = 0;
+        totalDepth = 0;
+        for (int t = 0; t < TRIALS; t++) {
+            int[] arr = random.ints(n, 0, 100000).toArray();
+            MetricsObserver metrics = new MetricsObserver();
+            QuickSort sorter = new QuickSort(metrics);
+            sorter.sort(arr);
+            totalComparisons += metrics.comparisons;
+            totalAllocations += metrics.allocations;
+            totalDepth += metrics.maxDepth;
         }
+        System.out.println("QuickSort: comps=" + totalComparisons / TRIALS +
+                " allocs=" + totalAllocations / TRIALS +
+                " depth=" + totalDepth / TRIALS);
 
-        fw.close();
-      
+        // ----- Median of Medians (Selection) -----
+        totalComparisons = 0;
+        totalAllocations = 0;
+        totalDepth = 0;
+        for (int t = 0; t < TRIALS; t++) {
+            int[] arr = random.ints(n, 0, 100000).toArray();
+            MetricsObserver metrics = new MetricsObserver();
+            MedianOfMedians selector = new MedianOfMedians(metrics);
+            int k = n / 2;
+            selector.select(arr, k);
+            totalComparisons += metrics.comparisons;
+            totalAllocations += metrics.allocations;
+            totalDepth += metrics.maxDepth;
+        }
+        System.out.println("MedianOfMedians: comps=" + totalComparisons / TRIALS +
+                " allocs=" + totalAllocations / TRIALS +
+                " depth=" + totalDepth / TRIALS);
+
+        // ----- Closest Pair of Points -----
+        totalComparisons = 0;
+        totalAllocations = 0;
+        totalDepth = 0;
+        for (int t = 0; t < TRIALS; t++) {
+            Point[] pts = new Point[n];
+            for (int i = 0; i < n; i++) {
+                pts[i] = new Point(random.nextDouble() * 10000, random.nextDouble() * 10000);
+            }
+            MetricsObserver metrics = new MetricsObserver();
+            ClosestPair cp = new ClosestPair(metrics);
+            cp.findClosest(pts);
+            totalComparisons += metrics.comparisons;
+            totalAllocations += metrics.allocations;
+            totalDepth += metrics.maxDepth;
+        }
+        System.out.println("ClosestPair: comps=" + totalComparisons / TRIALS +
+                " allocs=" + totalAllocations / TRIALS +
+                " depth=" + totalDepth / TRIALS);
+
+        System.out.println();
     }
 }
