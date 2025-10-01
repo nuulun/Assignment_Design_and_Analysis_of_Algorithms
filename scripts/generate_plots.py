@@ -6,15 +6,21 @@ import os
 def main(csv_file, out_dir):
     os.makedirs(out_dir, exist_ok=True)
 
+    # Читаем CSV, учтём нижний регистр столбцов
     df = pd.read_csv(csv_file)
 
+    # Проверим наличие нужных колонок
+    expected_columns = {"algorithm", "n", "timeMs"}
+    if not expected_columns.issubset(df.columns):
+        sys.exit(1)
 
-    for algo in df["Algorithm"].unique():
-        subset = df[df["Algorithm"] == algo]
-        grouped = subset.groupby("N").mean(numeric_only=True)
+    # Для каждого алгоритма построим график времени
+    for algo in df["algorithm"].unique():
+        subset = df[df["algorithm"] == algo]
+        grouped = subset.groupby("n").mean(numeric_only=True)
 
         plt.figure()
-        plt.plot(grouped.index, grouped["TimeMs"], marker="o")
+        plt.plot(grouped.index, grouped["timeMs"], marker="o")
         plt.title(f"{algo} - Runtime")
         plt.xlabel("Input size (N)")
         plt.ylabel("Time (ms)")
@@ -26,7 +32,6 @@ def main(csv_file, out_dir):
         print(f"✅ Saved {out_path}")
 
     
-
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
