@@ -1,9 +1,9 @@
 package algo;
 
 public class MetricsObserver {
-    private long comparisons = 0;
-    private long allocations = 0;
-    private int maxDepth = 0;
+    public long comparisons = 0;
+    public long allocations = 0;
+    public int maxDepth = 0;
 
     public void onComparison() {
         comparisons++;
